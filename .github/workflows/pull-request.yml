@@ -9,14 +9,15 @@ on:
 
 jobs:
   build:
-    name: "${{ matrix.SECCOMP == '1' && 'seccomp' || 'no-seccomp' }}"
-    runs-on: ubuntu-latest
+    name: "${{ matrix.SECCOMP == '1' && 'seccomp' || 'no-seccomp' }} | ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
     env:
       BUILD_WRAPPER_OUT_DIR: tmp
     strategy:
       fail-fast: false
       matrix:
         SECCOMP: [ 0, 1 ]
+        os: [ubuntu-24.04, ubuntu-26.04]
 
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
@@ -29,7 +30,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq clang-tools-12 curl gdb lcov libarchive-dev libtalloc-dev sloccount strace swig uthash-dev python3-dev lzop
+          sudo apt-get install -qq clang-tools curl gdb lcov libarchive-dev libtalloc-dev sloccount strace swig uthash-dev python3-dev lzop
 
       - name: Gather analytics
         run: sloccount --details .
